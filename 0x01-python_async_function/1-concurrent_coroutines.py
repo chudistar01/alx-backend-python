@@ -1,5 +1,5 @@
 #!/usr/bin/env  python3
-""" Aynchronous Function 
+""" Aynchronous Function
 """
 
 import asyncio
