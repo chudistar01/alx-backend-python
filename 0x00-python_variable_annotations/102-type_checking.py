@@ -3,7 +3,7 @@
 from typing import Tuple, List, Union
 
 
-def zoom_array(lst: Tuple, factor: int = 2) -> List:
+def zoom_array(lst: Tuple[int, ...], factor: int = 2) -> List:
     """Zoom array"""
     zoomed_in: List = [
         item for item in lst
