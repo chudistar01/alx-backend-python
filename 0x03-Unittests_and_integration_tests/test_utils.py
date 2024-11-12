@@ -16,7 +16,7 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": 1}, ("a",), 1),
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2),
-        ])
+    ])
     def test_access_nested_map(self, nested_map: Dict, path: Tuple[str],
                                expected: Union[Dict, int],
                                ) -> None:
@@ -26,7 +26,7 @@ class TestAccessNestedMap(unittest.TestCase):
     @parameterized.expand([
         ({}, ("a",), KeyError),
         ({"a": 1}, ("a", "b"), KeyError),
-        ])
+    ])
     def test_access_nested_map_exception(self,
                                          nested_map: Dict, path: Tuple[str],
                                          exception: Exception,
@@ -39,23 +39,24 @@ class TestAccessNestedMap(unittest.TestCase):
 class TestGetJson(unittest.TestCase):
     """ Test the get_json function """
     @parameterized.expand([
-        ["http://example.com", {"payload": True}],
-        ["http://holberton.io", {"payload": False}],
-        ])
-    def test_get_json(
-            self,
-            test_url: str,
-            test_payload: Dict,
-            ) -> None:
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
+    ])
+    @patch('utils.requests.get')
+    def test_get_json(self, test_url, test_payload, mock_get):
         """ tests output """
-        attrs = {'json.return_value': test_payload}
-        with patch("requests.get", return_value=Mock(**attrs)) as req_get:
-            self.assertEqual(get_json(test_url), test_payload)
-            req_get.assert_called_once_with(test_url)
+        mock_response = Mock()
+        mock_response.json.return_value = test_payload
+        mock_get.return_value = mock_response
+
+        result = get_json(test_url)
+        self.assertEqual(result, test_payload)
+        mock_get.assert_called_once_with(test_url)
 
 
 class TestMemoize(unittest.TestCase):
     """ Tests memize function """
+
     def test_memoize(self) -> None:
         """Test memoize output """
         class TestClass:
@@ -69,7 +70,7 @@ class TestMemoize(unittest.TestCase):
                 TestClass,
                 "a_method",
                 return_value=lambda: 42,
-                ) as memo_fxn:
+        ) as memo_fxn:
             test_class = TestClass()
             self.assertEqual(test_class.a_property(), 42)
             self.assertEqual(test_class.a_property(), 42)
