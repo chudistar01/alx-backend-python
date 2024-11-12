@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import unittest
-from unittest.mock import patch, PropertyMock
-from parameterized import parameterized
+from unittest.mock import patch, PropertyMock, Mock
+from parameterized import parameterized, parameterized_class
 from client import GithubOrgClient
+from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -60,3 +61,45 @@ class TestGithubOrgClient(unittest.TestCase):
     def test_has_license(self, repo, license_key, expected_result):
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected_result)
+
+
+@parameterized_class([{"org_payload": org_payload,
+                       "repos_payload": repos_payload,
+                       "expected_repos": expected_repos,
+                       "apache2_repos": apache2_repos}])
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """tests"""
+    @classmethod
+    def setUpClass(cls):
+        """tests"""
+        cls.get_patcher = patch('client.requests.get')
+
+        cls.mock_get = cls.get_patcher.start()
+
+        def get_json_side_effect(url):
+            if url == "https://api.github.com/orgs/google":
+                return cls.org_payload
+            elif url == "https://api.github.com/orgs/google/repos":
+                return cls.repos_payload
+            return None
+
+        cls.mock_get.return_value = Mock(
+            json=Mock(side_effect=get_json_side_effect))
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tests"""
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """tests"""
+        client = GithubOrgClient("google")
+        self.assertEqual(client.public_repos(), self.expected_repos)
+
+    def test_public_repos_with_license(self):
+        """tests"""
+        client = GithubOrgClient("google")
+        self.assertEqual(
+            client.public_repos(
+                license="apache-2.0"),
+            self.apache2_repos)
