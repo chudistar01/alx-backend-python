@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""test module
+0;276;0c"""test module
 """
 import unittest
 from typing import Dict, Tuple, Union
@@ -39,8 +39,8 @@ class TestAccessNestedMap(unittest.TestCase):
 class TestGetJson(unittest.TestCase):
     """ Test the get_json function """
     @parameterized.expand([
-        ("http://example.com", test_payload={"payload": True}),
-        ("http://holberton.io", test_payload={"payload": False}),
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
         ])
     def test_get_json(
             self,
