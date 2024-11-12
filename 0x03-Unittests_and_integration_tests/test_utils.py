@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-0;276;0c"""test module
+"""test module
 """
 import unittest
 from typing import Dict, Tuple, Union
